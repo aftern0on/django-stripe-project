@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ item.name }}</title>
+</head>
+<body>
+    <h1>{{ item.name }} (Payment Intent_)</h1>
+    <p>{{ item.description }}</p>
+    <p>Цена: {{ item.price }} {{ item.currency }}.</p>
+    <br>
+    <form id="payment-form">
+        <div id="card-element"></div>
+        <button type="submit">Оплатить</button>
+    </form>
+    <div id="success-message" style="color: green;"></div>
+    <div id="error-message" style="color: red;"></div>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        // Получение основных инструментов работы со Stripe и формы
+        var stripe = Stripe('pk_test_51OPTRBI94bcLY9kP8YIZliLpidbgfiw9S4deGNYMDraIGqDPOyAW4ZTMriuYYOlRaA1ErAYhxywZd83d1AeyZpj400wDF7FHnD');
+        var elements = stripe.elements();
+        var card = elements.create('card');
+        var form = document.getElementById("payment-form");
+
+        // Вставка формы ввода карты
+        card.mount('#card-element');
+
+        // Окна для вывода информации о работе системы
+        var successMessage = document.getElementById('success-message');
+        var errorMessage = document.getElementById('error-message')
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            fetch('/api/buy_intent/{{ item.id }}')
+                .then(response => response.json())
+                .then(function(result) {
+                    return stripe.confirmCardPayment(result.client_secret, {
+                        payment_method: { card: card }
+                    });
+                })
+                .then(function(result) {
+                    if (result.error) {
+                        errorMessage.textContent = result.error.message
+                    }
+                    else {
+                        successMessage.textContent = 'Оплата завершена, id: ' + result.paymentIntent.id;
+                    }
+                });
+        });
+    </script>
+</body>
+</html>

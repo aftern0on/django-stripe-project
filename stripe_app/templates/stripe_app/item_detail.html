@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ item.name }}</title>
+</head>
+<body>
+    <h1>{{ item.name }}</h1>
+    <p>{{ item.description }}</p>
+    <p>Цена: {{ item.price }} {{ item.currency }}.</p>
+    <button id="checkout_button">Купить</button>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        document.getElementById('checkout_button').addEventListener('click', function() {
+            // Отправка запроса на /buy/{id}
+            fetch('/api/buy/{{ item.id }}')
+                .then(response => response.json())
+                .then(data => {
+                    // Перенаправление пользователя на checkout
+                    var stripe = Stripe('pk_test_51OPTRBI94bcLY9kP8YIZliLpidbgfiw9S4deGNYMDraIGqDPOyAW4ZTMriuYYOlRaA1ErAYhxywZd83d1AeyZpj400wDF7FHnD');
+                    stripe.redirectToCheckout({
+                        sessionId: data.session_id
+                    }).then(function(result) {
+                        // Обработка ошибок, если таковые имеются
+                        if (result.error) {
+                            alert(result.error.message);
+                        }
+                    })
+                })
+        })
+    </script>
+</body>
+</html>

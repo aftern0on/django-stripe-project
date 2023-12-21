@@ -1,0 +1,26 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Django
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Pipenv
+Pipfile
+Pipfile.lock
+
+# Decouple
+.env
+
+# Docker
+.docker/
+docker-compose.yml
+docker-compose.override.yml
